@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+ 	<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+
+	
+
+
+<style>
+ons-toolbar.toolbar.toolbar--material{	
+  background-color: cornsilk;
+}
+</style>
+
+
+</head>
+<body>
+
+<ons-navigator id="appNavigator" swipeable swipe-target-width="80px">
+  <ons-page>
+    <ons-splitter id="appSplitter">	
+      <ons-splitter-content page="tabbar.html"></ons-splitter-content>
+    </ons-splitter>
+  </ons-page>
+</ons-navigator>
+
+<template id="tabbar.html">
+  <ons-page id="tabbar-page">
+	<ons-tabbar swipeable  id="appTabbar"  position="bottom">
+<!--
+		<ons-tab page="filter.html" label="Test" icon="fa-bar-chart" active></ons-tab>
+			-->
+		<ons-tab page="filter.html" label="Lọc dữ liệu" icon="fa-bar-chart"></ons-tab>
+		<ons-tab page="mydata.html" label="Danh mục của Bạn" icon="fa-hand-holding-usd" active></ons-tab>
+		<ons-tab page="news.html" label="Tin Tức" icon="fa-newspaper-o" badge="N"></ons-tab>
+		<ons-tab page="setting.html" label="Tài Khoản" icon="fa-user-alt" ></ons-tab>
+
+	</ons-tabbar>
+
+  </ons-page>
+</template>
+
+<template id="filter.html">
+  <ons-page id="on_filter_html">
+  </ons-page>
+</template>
+
+<template id="setting.html">
+  <ons-page id="on_setting_html">	  
+  </ons-page>
+</template>
+
+<template id="mydata.html">
+  <ons-page id="on_mydata_html">	
+  </ons-page>
+</template>
+
+<template id="news.html">
+  <ons-page id="on_news_html">
+  </ons-page>
+</template>
+
+<ons-modal direction="up">
+  <div style="text-align: center">
+    <p>
+      <ons-icon icon="md-spinner" size="28px" spin></ons-icon>
+    </p>
+  </div>
+</ons-modal>
+
+<template id="divtam_section">
+</template>
+
+<template id="divtam_category">
+</template>
+
+<template id="divtam_detail">
+</template>
+
+<script>
+
+window.fn = {};
+
+window.fn.toggleMenu = function () {
+  document.getElementById('appSplitter').right.toggle();
+};
+
+window.fn.loadView = function (index) {
+  document.getElementById('appTabbar').setActiveTab(index);
+  document.getElementById('sidemenu').close();
+};
+
+window.fn.loadLink = function (url) {
+  window.open(url, '_blank');
+};
+
+window.fn.pushPage = function (page, anim) {
+  if (anim) {
+    document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title }, animation: anim });
+  } else {
+    document.getElementById('appNavigator').pushPage(page.id, { data: { title: page.title } });
+  }
+};
+
+window.fn.open = function() {
+  var menu = document.getElementById('menu');
+  menu.open();
+};
+
+window.fn.load = function(page) {
+  var content = document.getElementById('content');
+  var menu = document.getElementById('menu');
+  content.load(page)
+    .then(menu.close.bind(menu));
+};
+
+document.addEventListener('prechange', function(event) {
+  // document.querySelector('ons-toolbar .center').innerHTML = event.tabItem.getAttribute('label');  
+  // console.log("prechange: " + event.tabItem.getAttribute('page'));  
+	// Show loading ..
+	  // console.log(event);   
+
+	// showModal('show');
+	
+	var url = '';
+	var page = event.tabItem.getAttribute('page');
+	if(page == 'setting.html'){
+		url = "http://mamsongdamchoi.com/mb/df/setting.php";
+	}else if(page == 'news.html'){
+		url = "http://mamsongdamchoi.com/mb/df/news.php";
+	}else if(page == 'mydata.html'){
+		url = "http://mamsongdamchoi.com/mb/df/mydata.php";
+	}else if(page == 'filter.html'){
+		url = "http://mamsongdamchoi.com/mb/df/filter.php";
+	}
+	
+	 var rand = Math.random();
+	if(url !== ''){
+		$.ajax({
+		url: url + '?v=' + rand,
+		type: "GET", 
+		crossDomain: true,
+		success: function (data) {
+			var ons_id = 'ons-page #on_'+ page.replace(".", "_");
+			// alert(data);
+		   document.querySelector(ons_id).innerHTML = data;  
+		   // document.querySelector('ons-page #on_setting_html').innerHTML = data; 
+	   
+		 }
+	   });
+	}
+	  
+});
+
+
+
+document.addEventListener('postchange', function(event) {
+	// disable loading ..
+  // console.log("postchange: " + event.tabItem.getAttribute('label'));  
+  // console.log(event);  
+	// showModal('hide');
+});
+
+// function showModal(show) {
+/*   var modal = document.querySelector('ons-modal');
+  if(show == 'show'){
+	modal.show();
+  }else{
+	modal.hide();
+  }; */
+// }
+
+
+function getDataTmp(url, divname) {
+		$.ajax({
+		url: url,
+		type: "GET", 
+		success: function (data) {
+		   document.getElementById(divname).innerHTML = data;  
+		    fn.pushPage({'id': divname, 'title': 'Data 1'});
+		 }
+	   });	   
+}
+
+function loadmenupage(pageurl)
+{
+	$.ajax({
+	url: pageurl,
+	type: "GET", 
+	success: function (data) {
+	   document.getElementById('appNavigator').innerHTML = data; 		 
+	 }
+   });
+}; 
+
+
+var logout = function() { 
+	window.localStorage.removeItem("fullname");
+	showlogin();  
+}; 
+
+var showlogin = function() {
+	$.ajax({
+	url: "http://mamsongdamchoi.com/mb/df/login.php",
+	type: "GET", 
+	success: function (data) {
+	   document.getElementById('appNavigator').innerHTML = data; 		 
+	 }
+   });
+}; 
+
+var showdefaultpage = function() {
+		var rand = Math.random();
+		$.ajax({
+		url: 'http://mamsongdamchoi.com/mb/df/mydata.php?v=' + rand,
+		type: "GET", 
+		crossDomain: true,
+		success: function (data) {
+			var ons_id = 'ons-page #on_mydata_html';			
+		   document.querySelector(ons_id).innerHTML = data;  	   
+		 }
+	   });
+	   
+	   // $.ajax({
+		// url: 'http://mamsongdamchoi.com/mb/df/filter_category.php?v=' + rand,
+		// type: "GET", 
+		// crossDomain: true,
+		// success: function (data) {
+			// var ons_id = 'ons-page #on_filter_html';			
+		   // document.querySelector(ons_id).innerHTML = data;  	   
+		 // }
+	   // });
+	   
+	   
+	   
+}; 
+
+
+var login = function() {
+	window.localStorage.removeItem("fullname");
+    var username1 = document.getElementById('username').value;  
+    var password1 = document.getElementById('password').value;
+	// TODO: check login
+    if (username1 === 'admin' && password1 === 'admin') {  
+			var storage = window.localStorage;
+			storage.setItem('fullname', 'Chuong Hoa Hoan');
+			showdefaultpage();
+			fn.pushPage({'id': 'tabbar.html'});
+    } else {  
+        ons.notification.alert('Incorrect username or password.');  
+    }  
+}; 
+
+var changepassword = function(){
+	alert('Chưa làm!');
+}
+
+$( document ).ready(function() {
+    console.log( "ready!" );
+	
+	var storage = window.localStorage;
+	var value = storage.getItem("fullname");	
+	if(value == ''){
+		showlogin();  
+	} else if(typeof value === 'undefined') {
+		showlogin();  
+	} else if(value === null){
+		showlogin();  
+	}else {
+		//TODO: check time của token
+		// Nếu hết ajax check lại trên server
+		
+		//load home page
+		showdefaultpage();
+	}
+	
+
+});
+
+function showhideSheet(){
+	 $( "#filter_detail_content_list" ).slideToggle( "slow", function() {
+
+  });
+}
+
+function showFilterCategory(id){
+	if(id =='all'){
+		$(".filter_category_list_card").show();
+	}else{
+		$(".filter_category_list_card").hide();
+		$("[data-attribute='"+id+"']").show();
+	}
+
+	document.getElementById('filter_detail_content_list').style.display='none';	
+}
+
+function addDMCT(id){
+	if(id =='1'){
+		alert("Đã thêm vào danh mục sở hữu");
+	}else{		
+		alert("Đã thêm vào danh mục theo dõi");
+	}
+}
+
+
+function showDMcuatoi(){
+	 $( "#filter_detail_content_dmct" ).slideToggle( "slow", function() {
+
+  });
+}
+
+</script>
+
+        <script src="cordova.js"></script>
+</body>
+</html>
