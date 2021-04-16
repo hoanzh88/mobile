@@ -58,6 +58,12 @@
   </ons-page>
 </template>
 
+<template id="other1.html">
+  <ons-page id="on_other1_html">
+  Loading...
+  </ons-page>
+</template>
+
 <ons-modal direction="up">
   <div style="text-align: center">
     <p>
@@ -102,8 +108,8 @@ window.fn.pushPage = function (page, anim) {
   }
 };
 
-window.fn.open = function() {
-  var menu = document.getElementById('menu');
+window.fn.open = function(id_menu) {
+  var menu = document.getElementById(id_menu);
   menu.open();
 };
 
@@ -265,12 +271,13 @@ var showlogin = function() {
 }; 
 
 var checktoken = function() {
+	var rand = Math.random();
 	var token = window.localStorage.getItem("token");
 	$.ajax({
-	url: "http://mamsongdamchoi.com/mb/df/checktoken.php?token="+token,
+	url: 'http://mamsongdamchoi.com/mb/df/checktoken.php'+'?v=' + rand + '&token='+token,
 	type: "GET", 
 	success: function (islogout) {
-		if(islogout == 1){
+		if(islogout.trim().length === 0){
 			window.localStorage.removeItem("token");
 			showlogin();  
 		}
@@ -286,14 +293,14 @@ var showdefaultpage = function() {
 		type: "GET", 
 		crossDomain: true,
 		success: function (data) {			
-			getAlertShow();
+			<!-- getAlertShow(); -->
 			var ons_id = 'ons-page #on_mydata_html';			
 		   document.querySelector(ons_id).innerHTML = data;  	
 			 
 		 }
 	   });
 	   
-	   setBadge(0);
+	   <!-- setBadge(0); -->
 	   <!--  -->
 	   <!-- setTimeout(getAlertShow(), 3000); -->
 	 
@@ -345,6 +352,34 @@ var registernewaccount = function() {
 	});
 }; 
 
+var createCategory = function() {
+	var token = window.localStorage.getItem("token");
+    var categoryname = document.getElementById('categoryname').value;  
+    var category_items = document.getElementById('category_items').value;
+	if (categoryname.trim().length === 0 ) {
+			ons.notification.alert('Vui lòng nhập tên danh mục.');  
+			return false;
+	}else if (category_items.trim().length === 0 ) {
+			ons.notification.alert('Vui lòng nhập mã chứng khoán.');  
+			return false;
+	}
+	showhidecategory('add_category_form','hide','view_category','show');
+	var rand = Math.random();
+	var url_createcategory = 'http://mamsongdamchoi.com/mb/df/category_save.php?v=' + rand;
+	$.post(url_createcategory, {
+		token: token, categoryname: categoryname, category_items: category_items
+	},function(results) {
+		if (results != '') {		
+				<!-- var storage = window.localStorage; -->
+				<!-- storage.setItem('token', results); -->
+				<!-- showdefaultpage(); -->				
+				getDataTmp('http://mamsongdamchoi.com/mb/df/category.php?v='+rand+'&token='+token, 'divtam_category');
+		} else {  
+			<!-- ons.notification.alert('Incorrect username or password.');   -->
+		}  
+	});
+}; 
+
 var login = function() {
 	window.localStorage.removeItem("token");
     var username = document.getElementById('username').value;  
@@ -365,15 +400,6 @@ var login = function() {
 			ons.notification.alert('Incorrect username or password.');  
 		}  
 	});
-	
-   // if (username === 'admin' && password === 'admin') {  
-		//	var storage = window.localStorage;
-		//	storage.setItem('fullname', 'Chuong Hoa Hoan');
-		//	showdefaultpage();
-		//	fn.pushPage({'id': 'tabbar.html'});
-  //  } else {  
-  //      ons.notification.alert('Incorrect username or password.');  
-  //  }  
 }; 
 
 function removeBadge(){
@@ -447,6 +473,19 @@ function showDMcuatoi(){
   });
 }
 
+function showhidecategory(id_1, status_1, id_2, status_2){
+	if(status_1 =='show'){
+		 $( "#"+id_1 ).show();
+	}else{
+		 $( "#"+id_1 ).hide();
+	}
+	
+	if(status_2 =='show'){
+		 $( "#"+id_2 ).show();
+	}else{
+		 $( "#"+id_2 ).hide();
+	}	
+}
 </script>
 
         <script src="cordova.js"></script>
